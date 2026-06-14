@@ -1,0 +1,43 @@
+# MOSADE full benchmark configuration
+# =====================================
+# Includes unconstrained (ZDT, WFG) and constrained (DASCMOP) suites.
+# Expect several hours of runtime with 30 runs per problem.
+
+tag: "full_benchmark"
+results_dir: "results"
+seed: 42
+n_runs: 30
+
+algorithm:
+  pop_size: 100
+  max_evals: 100000
+
+problems:
+  # ZDT suite (unconstrained, 2-obj)
+  - ZDT1
+  - ZDT2
+  - ZDT3
+  - ZDT4
+  - ZDT6
+
+  # WFG suite (unconstrained, 2-obj, diverse geometries)
+  - WFG1
+  - WFG2
+  - WFG3
+  - WFG4
+  - WFG5
+  - WFG6
+  - WFG7
+  - WFG8
+  - WFG9
+
+  # DASCMOP constrained suite at difficulty levels 1, 7, 13
+  - {name: DASCMOP1, difficulty: 1}
+  - {name: DASCMOP1, difficulty: 7}
+  - {name: DASCMOP1, difficulty: 13}
+  - {name: DASCMOP4, difficulty: 1}
+  - {name: DASCMOP4, difficulty: 7}
+  - {name: DASCMOP4, difficulty: 13}
+  - {name: DASCMOP7, difficulty: 1}
+  - {name: DASCMOP7, difficulty: 7}
+  - {name: DASCMOP7, difficulty: 13}

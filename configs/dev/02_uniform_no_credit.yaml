@@ -1,0 +1,14 @@
+tag: "dev_uniform_no_credit"
+results_dir: "results"
+seed: 42
+n_runs: 5
+
+algorithm:
+  pop_size: 60
+  max_evals: 6000
+  disable_credit: true
+  track_interval: 300
+
+problems:
+  - ZDT3
+  - WFG4

@@ -1,0 +1,40 @@
+tag: "benchmark_wfg"
+results_dir: "results"
+seed: 42
+n_runs: 31
+parallel_workers: 8
+
+algorithms:
+  - name: MOSADE
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 3000
+  - name: NSGA2
+    pop_size: 100
+    max_evals: 300000
+  - name: MOEAD
+    pop_size: 100
+    max_evals: 300000
+  - name: NSGA3
+    pop_size: 100
+    max_evals: 300000
+  - name: SPEA2
+    pop_size: 100
+    max_evals: 300000
+  - name: SMSEMOA
+    pop_size: 100
+    max_evals: 300000
+  - name: MOEAD_DE
+    pop_size: 100
+    max_evals: 300000
+
+problems:
+  - WFG1
+  - WFG2
+  - WFG3
+  - WFG4
+  - WFG5
+  - WFG6
+  - WFG7
+  - WFG8
+  - WFG9

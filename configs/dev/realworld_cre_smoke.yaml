@@ -1,0 +1,24 @@
+tag: "realworld_cre_smoke"
+results_dir: "results"
+seed: 42
+parallel_workers: 4
+n_runs: 3
+
+problems:
+  - name: CRE21
+  - name: CRE22
+  - name: CRE31
+
+algorithms:
+  - name: MOSADE
+    pop_size: 50
+    max_evals: 5000
+    track_interval: 1000
+
+  - name: NSGA2
+    pop_size: 50
+    max_evals: 5000
+
+  - name: MOEAD
+    pop_size: 50
+    max_evals: 5000

@@ -1,0 +1,19 @@
+# MOSADE default experiment configuration
+# ========================================
+# Edit this file or create a copy for your specific experiment.
+
+tag: "default"
+results_dir: "results"
+seed: 42
+n_runs: 30
+
+algorithm:
+  pop_size: 100
+  max_evals: 100000
+
+problems:
+  - ZDT1
+  - ZDT2
+  - ZDT3
+  - ZDT4
+  - ZDT6

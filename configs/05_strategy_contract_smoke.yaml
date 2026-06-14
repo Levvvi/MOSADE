@@ -1,0 +1,25 @@
+tag: "dev_strategy_contract_smoke"
+results_dir: "results"
+seed: 42
+n_runs: 3
+
+algorithms:
+  - name: MOSADE_single_S1
+    type: MOSADE_single_S1
+    pop_size: 40
+    max_evals: 2000
+  - name: MOSADE_single_S2
+    type: MOSADE_single_S2
+    pop_size: 40
+    max_evals: 2000
+  - name: MOSADE_single_S3
+    type: MOSADE_single_S3
+    pop_size: 40
+    max_evals: 2000
+  - name: MOSADE_single_S4
+    type: MOSADE_single_S4
+    pop_size: 40
+    max_evals: 2000
+
+problems:
+  - ZDT1

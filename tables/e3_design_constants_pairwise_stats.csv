@@ -1,0 +1,1 @@
+problem,metric,reference_algorithm,comparison_algorithm,direction,paired_or_unpaired,test_name,statistic,p_value,p_adjust_method,p_adjusted,significant_alpha_0p05,effect_size_name,effect_size,n_reference,n_comparison,unsupported_policy,missing_policy,seed_pairing_policy

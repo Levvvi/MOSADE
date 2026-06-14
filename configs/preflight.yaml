@@ -1,0 +1,39 @@
+tag: "preflight"
+results_dir: "results"
+seed: 42
+n_runs: 1
+
+algorithms:
+  - name: MOSADE
+    pop_size: 20
+    max_evals: 1000
+    track_interval: 200
+  - name: NSGA2
+    pop_size: 20
+    max_evals: 1000
+  - name: MOEAD
+    pop_size: 20
+    max_evals: 1000
+  - name: NSGA3
+    pop_size: 20
+    max_evals: 1000
+  - name: SPEA2
+    pop_size: 20
+    max_evals: 1000
+  - name: SMSEMOA
+    pop_size: 20
+    max_evals: 1000
+  - name: MOEAD_DE
+    pop_size: 20
+    max_evals: 1000
+
+problems:
+  - ZDT1
+  - ZDT3
+  - ZDT4
+  - {name: DTLZ2, n_obj: 3}
+  - WFG1
+  - WFG4
+  - WFG9
+  - {name: DASCMOP1, difficulty: 7}
+  - {name: DASCMOP7, difficulty: 7}

@@ -1,0 +1,40 @@
+tag: a1_epsilon_modes_supplementary_hard_constraints
+results_dir: results
+seed: 42
+parallel_workers: 6
+n_runs: 1
+seed_list:
+- 2684470948
+a1_supplementary_provenance:
+  seed_source: seed_sequence(42,1)
+  expanded_seed_list:
+  - 2684470948
+  seed_list_sha256: 497acc476aa3b1fc06a79e3d61bd18869c56b1e90354c483893b56d77fccd288
+  previous_a1_formal_source_snapshot_sha256: fea6fd4c3a2686c3c7e5163cc20db0b56f5d2c01cb419c45ad763398553c6b6f
+  problem_roles:
+    DASCMOP1_difficulty13: primary_activation_problem
+    DASCMOP4_difficulty13: secondary_activation_problem
+    DASCMOP4_difficulty7: modification_request_coverage_inert_control
+    DASCMOP7_difficulty7: known_inert_reference
+algorithms:
+- name: MOSADE
+  pop_size: 100
+  max_evals: 30000
+  track_interval: 100
+- name: MOSADE_fixed_eps_initial
+  type: MOSADE_fixed_eps_initial
+  pop_size: 100
+  max_evals: 30000
+  track_interval: 100
+- name: MOSADE_eps_zero
+  type: MOSADE_eps_zero
+  pop_size: 100
+  max_evals: 30000
+  track_interval: 100
+problems:
+- name: DASCMOP1
+  difficulty: 13
+- name: DASCMOP4
+  difficulty: 13
+- name: DASCMOP4
+  difficulty: 7

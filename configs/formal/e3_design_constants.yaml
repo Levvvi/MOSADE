@@ -1,0 +1,41 @@
+tag: "sensitivity_design_constants_e3"
+results_dir: "results"
+seed: 42
+parallel_workers: 6
+n_runs: 11
+
+base_algorithm:
+  name: MOSADE
+  pop_size: 100
+  max_evals: 300000
+  track_interval: 0
+
+scan:
+  - parameter: memory_H
+    values:
+      low: 3
+      default: 5
+      high: 10
+  - parameter: lp
+    values:
+      low: 20
+      default: 50
+      high: 100
+  - parameter: stag_ratio
+    values:
+      low: 0.05
+      default: 0.1
+      high: 0.2
+  - parameter: pi_min
+    values:
+      low: 0.01
+      default: 0.05
+      high: 0.1
+
+problems:
+  - ZDT1
+  - ZDT3
+  - WFG4
+  - WFG9
+  - {name: DASCMOP7, difficulty: 7}
+  - {name: DTLZ2, n_obj: 3}

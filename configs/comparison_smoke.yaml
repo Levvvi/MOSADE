@@ -1,0 +1,23 @@
+tag: "comparison_smoke"
+results_dir: "results"
+seed: 42
+n_runs: 5
+
+algorithms:
+  - name: MOSADE
+    type: MOSADE
+    pop_size: 100
+    max_evals: 30000
+  - name: NSGA2
+    type: NSGA2
+    pop_size: 100
+    max_evals: 30000
+  - name: MOEAD
+    type: MOEAD
+    pop_size: 100
+    max_evals: 30000
+
+problems:
+  - ZDT1
+  - ZDT2
+  - ZDT3

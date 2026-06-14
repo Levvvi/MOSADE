@@ -1,0 +1,6 @@
+figure,source_csv_or_json,status,notes
+a1_epsilon_trajectory_DASCMOP7_difficulty7_seed0.png,results/a1_ablation_epsilon_modes/*/epsilon_history.json,created,
+ablation_effect_sizes_summary.png,tables/a*_effect_sizes.csv,created,
+a7_runtime_workers1_vs_workers6.png,tables/a7_runtime_summary.csv,missing_data,runtime summary has no finite medians
+cre_rankings_summary.png,tables/rebuilt_cre_rankings.csv,created,
+e3_design_constants_sensitivity.png,tables/e3_design_constants_summary.csv,missing_data,no finite E3 HV summary rows

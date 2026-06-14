@@ -1,0 +1,13 @@
+table_group,result_dir,exists
+main,results/20260417_034204_benchmark_zdt,True
+main,results/20260417_163055_benchmark_wfg,True
+main,results/20260418_172554_benchmark_dascmop,True
+main,results/20260419_103648_benchmark_dtlz_3obj,True
+cre,results/20260425_161424_benchmark_realworld_cre_2obj,True
+cre,results/20260425_162709_benchmark_realworld_cre_3obj,True
+ablation,results/20260423_055232_ablation_main_parallel,True
+ablation,results/a1_ablation_epsilon_modes,True
+ablation,results/a3_ablation_memory,True
+ablation,results/a4_ablation_restart,True
+ablation,results/a5_ablation_domselect,True
+ablation,results/e3_sensitivity_design_constants,True

@@ -1,0 +1,24 @@
+tag: "ablation_domselect_a5"
+results_dir: "results"
+seed: 42
+parallel_workers: 6
+n_runs: 31
+
+algorithms:
+  - name: MOSADE
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 0
+  - name: MOSADE_domselect
+    type: MOSADE_domselect
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 0
+
+problems:
+  - ZDT1
+  - ZDT3
+  - WFG4
+  - WFG9
+  - {name: DASCMOP7, difficulty: 7}
+  - {name: DTLZ2, n_obj: 3}

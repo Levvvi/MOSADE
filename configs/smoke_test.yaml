@@ -1,0 +1,16 @@
+# MOSADE smoke test configuration
+# =================================
+# Small budget, few runs, one problem.  Used to verify the pipeline works.
+# Should complete in under 30 seconds.
+
+tag: "smoke_test"
+results_dir: "results"
+seed: 123
+n_runs: 3
+
+algorithm:
+  pop_size: 50
+  max_evals: 5000
+
+problems:
+  - ZDT1

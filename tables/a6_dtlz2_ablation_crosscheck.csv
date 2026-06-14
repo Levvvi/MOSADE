@@ -1,0 +1,11 @@
+ablation_group,problem,algorithm_or_variant,seed_count_expected,seed_count_completed,missing_seeds,hv_ref_point,pf_source,status
+A1,DTLZ2_n_obj3,MOSADE,31,31,,see result problem reference_point.txt,problem.pareto_front or pymoo fallback,ok
+A1,DTLZ2_n_obj3,MOSADE_eps_zero,31,31,,see result problem reference_point.txt,problem.pareto_front or pymoo fallback,ok
+A1,DTLZ2_n_obj3,MOSADE_fixed_eps_initial,31,31,,see result problem reference_point.txt,problem.pareto_front or pymoo fallback,ok
+A3,DTLZ2_n_obj3,MOSADE,31,31,,see result problem reference_point.txt,problem.pareto_front or pymoo fallback,ok
+A3,DTLZ2_n_obj3,MOSADE_shared_memory,31,31,,see result problem reference_point.txt,problem.pareto_front or pymoo fallback,ok
+A4,DTLZ2_n_obj3,MOSADE,31,31,,see result problem reference_point.txt,problem.pareto_front or pymoo fallback,ok
+A4,DTLZ2_n_obj3,MOSADE_no_restart,31,31,,see result problem reference_point.txt,problem.pareto_front or pymoo fallback,ok
+A5,DTLZ2_n_obj3,MOSADE,31,31,,see result problem reference_point.txt,problem.pareto_front or pymoo fallback,ok
+A5,DTLZ2_n_obj3,MOSADE_domselect,31,31,,see result problem reference_point.txt,problem.pareto_front or pymoo fallback,ok
+E3,DTLZ2_n_obj3,,11,0,all,,,missing

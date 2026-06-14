@@ -1,0 +1,19 @@
+tag: sens_lp_100
+results_dir: results
+seed: 42
+n_runs: 3
+algorithms:
+- name: MOSADE
+  pop_size: 50
+  max_evals: 5000
+  track_interval: 1000
+  lp: 100
+  memory_H: 5
+  T_base_ratio: 0.1
+  pi_min: 0.05
+problems:
+- ZDT1
+- ZDT3
+- WFG4
+- WFG9
+- {name: DASCMOP7, difficulty: 7}

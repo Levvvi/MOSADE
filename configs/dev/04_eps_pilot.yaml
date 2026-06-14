@@ -1,0 +1,25 @@
+tag: "dev_eps_pilot"
+results_dir: "results"
+seed: 42
+n_runs: 5
+
+algorithms:
+  - name: MOSADE
+    pop_size: 80
+    max_evals: 12000
+    track_interval: 400
+  - name: MOSADE_fixed_eps_initial
+    type: MOSADE_fixed_eps_initial
+    pop_size: 80
+    max_evals: 12000
+    track_interval: 400
+  - name: MOSADE_fixed_eps_zero
+    type: MOSADE_fixed_eps_zero
+    pop_size: 80
+    max_evals: 12000
+    track_interval: 400
+
+problems:
+  - {name: DASCMOP1, difficulty: 1}
+  - {name: DASCMOP4, difficulty: 7}
+  - {name: DASCMOP7, difficulty: 13}

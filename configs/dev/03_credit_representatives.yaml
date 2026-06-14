@@ -1,0 +1,14 @@
+tag: "dev_credit_representatives"
+results_dir: "results"
+seed: 42
+n_runs: 5
+
+algorithm:
+  pop_size: 80
+  max_evals: 12000
+  track_interval: 400
+
+problems:
+  - ZDT3
+  - WFG9
+  - {name: DASCMOP7, difficulty: 13}

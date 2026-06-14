@@ -1,0 +1,27 @@
+tag: "a1_eps_modes_smoke"
+results_dir: "results"
+seed: 42
+parallel_workers: 1
+n_runs: 1
+
+algorithms:
+  - name: MOSADE
+    type: MOSADE
+    pop_size: 40
+    max_evals: 600
+    track_interval: 100
+
+  - name: MOSADE_fixed_eps_initial
+    type: MOSADE_fixed_eps_initial
+    pop_size: 40
+    max_evals: 600
+    track_interval: 100
+
+  - name: MOSADE_fixed_eps_zero
+    type: MOSADE_fixed_eps_zero
+    pop_size: 40
+    max_evals: 600
+    track_interval: 100
+
+problems:
+  - {name: DASCMOP7, difficulty: 13}

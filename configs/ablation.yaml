@@ -1,0 +1,51 @@
+# MOSADE ablation study configuration.
+#
+# Compares the full MOSADE against ablated variants:
+#   MOSADE                    - full algorithm
+#   MOSADE_single_S1          - only strategy S1
+#   MOSADE_fixed_eps_initial  - epsilon fixed at initial epsilon_0
+#   MOSADE_eps_zero           - epsilon fixed at 0 from generation 0
+#   MOSADE_uniform_strategy   - all strategies, uniform probabilities
+
+tag: "ablation"
+results_dir: "results"
+seed: 42
+n_runs: 31
+
+algorithms:
+  - name: MOSADE
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 3000
+
+  - name: MOSADE_single_S1
+    type: MOSADE_single_S1
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 3000
+
+  - name: MOSADE_fixed_eps_initial
+    type: MOSADE_fixed_eps_initial
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 3000
+
+  - name: MOSADE_eps_zero
+    type: MOSADE_eps_zero
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 3000
+
+  - name: MOSADE_uniform_strategy
+    type: MOSADE_uniform_strategy
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 3000
+
+problems:
+  - ZDT1
+  - ZDT3
+  - WFG4
+  - WFG9
+  - {name: DASCMOP7, difficulty: 7}
+  - {name: DTLZ2, n_obj: 3}

@@ -1,0 +1,28 @@
+# Optional placeholder for a future native MOON port.
+# Do not run this config until the MOON problem has been implemented locally.
+tag: "benchmark_realworld_moon_optional"
+results_dir: "results"
+seed: 42
+parallel_workers: 8
+n_runs: 21
+
+problems:
+  - name: MOON
+
+algorithms:
+  - name: MOSADE
+    pop_size: 105
+    max_evals: 31500
+    track_interval: 0
+
+  - name: NSGA2
+    pop_size: 105
+    max_evals: 31500
+
+  - name: MOEAD
+    pop_size: 105
+    max_evals: 31500
+
+  - name: NSGA3
+    pop_size: 105
+    max_evals: 31500

@@ -1,0 +1,24 @@
+tag: "benchmark_realworld_cre_2obj"
+results_dir: "results"
+seed: 42
+parallel_workers: 8
+n_runs: 21
+
+problems:
+  - name: CRE21
+  - name: CRE22
+  - name: CRE23
+
+algorithms:
+  - name: MOSADE
+    pop_size: 100
+    max_evals: 30000
+    track_interval: 0
+
+  - name: NSGA2
+    pop_size: 100
+    max_evals: 30000
+
+  - name: MOEAD
+    pop_size: 100
+    max_evals: 30000

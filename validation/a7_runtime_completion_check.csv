@@ -1,0 +1,52 @@
+check_type,worker_setting,problem,algorithm,expected_runs,completed_ok_runs,unsupported_runs,missing_runs,failed_runs,check_pass,notes
+formal_cell_completion,1,ZDT3,MOSADE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,ZDT3,NSGA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,ZDT3,MOEAD,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,ZDT3,NSGA3,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,ZDT3,SPEA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,ZDT3,MOEAD_DE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,WFG9,MOSADE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,WFG9,NSGA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,WFG9,MOEAD,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,WFG9,NSGA3,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,WFG9,SPEA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,WFG9,MOEAD_DE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,DTLZ2_n_obj3,MOSADE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,DTLZ2_n_obj3,NSGA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,DTLZ2_n_obj3,MOEAD,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,DTLZ2_n_obj3,NSGA3,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,DTLZ2_n_obj3,SPEA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,DTLZ2_n_obj3,MOEAD_DE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,DASCMOP7_difficulty13,MOSADE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,DASCMOP7_difficulty13,NSGA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,DASCMOP7_difficulty13,MOEAD,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,DASCMOP7_difficulty13,NSGA3,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,DASCMOP7_difficulty13,SPEA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,1,DASCMOP7_difficulty13,MOEAD_DE,31,0,31,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,ZDT3,MOSADE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,ZDT3,NSGA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,ZDT3,MOEAD,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,ZDT3,NSGA3,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,ZDT3,SPEA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,ZDT3,MOEAD_DE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,WFG9,MOSADE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,WFG9,NSGA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,WFG9,MOEAD,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,WFG9,NSGA3,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,WFG9,SPEA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,WFG9,MOEAD_DE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,DTLZ2_n_obj3,MOSADE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,DTLZ2_n_obj3,NSGA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,DTLZ2_n_obj3,MOEAD,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,DTLZ2_n_obj3,NSGA3,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,DTLZ2_n_obj3,SPEA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,DTLZ2_n_obj3,MOEAD_DE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,DASCMOP7_difficulty13,MOSADE,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,DASCMOP7_difficulty13,NSGA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,DASCMOP7_difficulty13,MOEAD,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,DASCMOP7_difficulty13,NSGA3,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,DASCMOP7_difficulty13,SPEA2,31,31,0,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+formal_cell_completion,6,DASCMOP7_difficulty13,MOEAD_DE,31,0,31,0,0,True,unsupported placeholders count as explicit completion but are excluded from median runtime
+smsemoa_absent_from_formal_table,,,SMSEMOA,,,,,,True,SMSEMOA must not appear in tables/table_4_12_replacement.csv
+smsemoa_diagnostic_present,1,DTLZ2_n_obj3,SMSEMOA,,3,,0,,True,Partial SMSEMOA rows are diagnostic only
+workers8_not_used,,,,,,,,,True,Legacy workers=8 table is not used in the replacement table

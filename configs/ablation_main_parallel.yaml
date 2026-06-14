@@ -1,0 +1,61 @@
+tag: "ablation_main_parallel"
+results_dir: "results"
+seed: 42
+parallel_workers: 8
+n_runs: 31
+
+algorithms:
+  - name: MOSADE
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 0
+
+  - name: MOSADE_single_S1
+    type: MOSADE_single_S1
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 0
+
+  - name: MOSADE_single_S2
+    type: MOSADE_single_S2
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 0
+
+  - name: MOSADE_single_S3
+    type: MOSADE_single_S3
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 0
+
+  - name: MOSADE_single_S4
+    type: MOSADE_single_S4
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 0
+
+  - name: MOSADE_uniform_strategy
+    type: MOSADE_uniform_strategy
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 0
+
+  - name: MOSADE_fixed_eps_initial
+    type: MOSADE_fixed_eps_initial
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 0
+
+  - name: MOSADE_eps_zero
+    type: MOSADE_eps_zero
+    pop_size: 100
+    max_evals: 300000
+    track_interval: 0
+
+problems:
+  - ZDT1
+  - ZDT3
+  - WFG4
+  - WFG9
+  - {name: DASCMOP7, difficulty: 7}
+  - {name: DTLZ2, n_obj: 3}

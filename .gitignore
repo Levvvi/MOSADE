@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+repo_root.code-workspace
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Results (track structure, not data)
+results/*
+!results/.gitkeep
+
+# Large external or raw data directories
+external/
+archive/
+
+# Local generated or private working materials
+docs/
+plot/
+summaries/
+*_assets/
+drafts/
+private/
+
+# Generated/intermediate working directories
+tmp/
+temp/
+.pytest_cache/
+
+# Rendered document pages and final document work products
+docs/MOSADE_Final_Integrated_Edit_Package/render_*/
+docs/MOSADE_Final_Integrated_Edit_Package/*.docx
+docs/MOSADE_Final_Integrated_Edit_Package/*.pdf
+
+# Logs
+*.log
+
+# Distribution
+*.whl
+*.tar.gz
+*.zip
+
+# Local reference documents not part of the source/data package
+Real word problems.pdf

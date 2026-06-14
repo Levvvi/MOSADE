@@ -1,0 +1,16 @@
+tag: "dev_skeleton_zdt"
+results_dir: "results"
+seed: 42
+n_runs: 5
+
+algorithm:
+  pop_size: 40
+  max_evals: 4000
+  fixed_strategy: 0
+  disable_credit: true
+  disable_epsilon: true
+  track_interval: 200
+
+problems:
+  - ZDT1
+  - ZDT2

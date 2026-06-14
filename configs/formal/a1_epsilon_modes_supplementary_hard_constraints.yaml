@@ -1,0 +1,100 @@
+tag: a1_epsilon_modes_supplementary_hard_constraints
+results_dir: results
+seed: 42
+parallel_workers: 6
+n_runs: 31
+seed_list:
+- 2684470948
+- 4091952314
+- 233227757
+- 3276785861
+- 3644269654
+- 1206282609
+- 3543069911
+- 3479688010
+- 877132087
+- 1244265337
+- 2740186692
+- 3884972972
+- 829139639
+- 2545567356
+- 2718398101
+- 176092387
+- 3528048386
+- 569531098
+- 1337295874
+- 612016888
+- 232150720
+- 2324106676
+- 1658700540
+- 609942288
+- 3405943863
+- 2257503667
+- 4018327298
+- 2224437599
+- 168388230
+- 911875363
+- 3699796293
+a1_supplementary_provenance:
+  seed_source: seed_sequence(42,31)
+  expanded_seed_list:
+  - 2684470948
+  - 4091952314
+  - 233227757
+  - 3276785861
+  - 3644269654
+  - 1206282609
+  - 3543069911
+  - 3479688010
+  - 877132087
+  - 1244265337
+  - 2740186692
+  - 3884972972
+  - 829139639
+  - 2545567356
+  - 2718398101
+  - 176092387
+  - 3528048386
+  - 569531098
+  - 1337295874
+  - 612016888
+  - 232150720
+  - 2324106676
+  - 1658700540
+  - 609942288
+  - 3405943863
+  - 2257503667
+  - 4018327298
+  - 2224437599
+  - 168388230
+  - 911875363
+  - 3699796293
+  seed_list_sha256: 4c5f34b3297d6caeac5625ac588b0b2d5429d0b590e7263547e6d56dfd33ab67
+  previous_a1_formal_source_snapshot_sha256: fea6fd4c3a2686c3c7e5163cc20db0b56f5d2c01cb419c45ad763398553c6b6f
+  problem_roles:
+    DASCMOP1_difficulty13: primary_activation_problem
+    DASCMOP4_difficulty13: secondary_activation_problem
+    DASCMOP4_difficulty7: modification_request_coverage_inert_control
+    DASCMOP7_difficulty7: known_inert_reference
+algorithms:
+- name: MOSADE
+  pop_size: 100
+  max_evals: 300000
+  track_interval: 100
+- name: MOSADE_fixed_eps_initial
+  type: MOSADE_fixed_eps_initial
+  pop_size: 100
+  max_evals: 300000
+  track_interval: 100
+- name: MOSADE_eps_zero
+  type: MOSADE_eps_zero
+  pop_size: 100
+  max_evals: 300000
+  track_interval: 100
+problems:
+- name: DASCMOP1
+  difficulty: 13
+- name: DASCMOP4
+  difficulty: 13
+- name: DASCMOP4
+  difficulty: 7
