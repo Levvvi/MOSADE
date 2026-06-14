@@ -5,7 +5,7 @@ import pytest
 
 from mosade.problems.wfg import (
     WFG1, WFG2, WFG3, WFG4, WFG5, WFG6, WFG7, WFG8, WFG9,
-    _b_param, _b_poly, _r_sum, _s_linear,
+    _b_param,
 )
 
 # Default config: M=2, n_var=24, k=4, l=20

@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from mosade.problems import ZDT1, ZDT2, ZDT3, ZDT4, ZDT6, DTLZ1, DTLZ2, DTLZ3, DTLZ4
+from mosade.problems import ZDT1, ZDT3, ZDT4, DTLZ1, DTLZ2, DTLZ3, DTLZ4
 
 
 class TestZDT1:

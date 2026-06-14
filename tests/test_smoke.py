@@ -6,7 +6,6 @@ run without errors and produce plausible output.
 """
 
 import numpy as np
-import pytest
 
 from mosade.algorithm import ALGORITHM_REGISTRY
 from mosade.algorithm.moead import MOEAD

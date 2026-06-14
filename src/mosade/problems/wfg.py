@@ -83,8 +83,8 @@ def _r_nonsep(y: np.ndarray, A: int) -> np.ndarray:
     result = np.zeros(N)
     for j in range(k):
         result += y[:, j]
-        for l in range(1, A):
-            result += np.abs(y[:, j] - y[:, (j + l) % k])
+        for offset in range(1, A):
+            result += np.abs(y[:, j] - y[:, (j + offset) % k])
     return _correct_to_01(result / (k / A * np.ceil(A / 2.0) * (1.0 + 2.0 * A - 2.0 * np.ceil(A / 2.0))))
 
 
@@ -200,7 +200,7 @@ class WFG1(_WFGBase):
 
     def _evaluate(self, X: np.ndarray):
         y = self._normalise_z(X)
-        N, k, l, M = y.shape[0], self._k, self._l, self.n_obj
+        N, k, M = y.shape[0], self._k, self.n_obj
 
         # t1: bias (polynomial for distance params only)
         t1 = y.copy()
@@ -241,7 +241,7 @@ class WFG2(_WFGBase):
 
     def _evaluate(self, X: np.ndarray):
         y = self._normalise_z(X)
-        N, k, l, M = y.shape[0], self._k, self._l, self.n_obj
+        N, k, distance_count, M = y.shape[0], self._k, self._l, self.n_obj
 
         # t1: shift (linear for distance params)
         t1 = y.copy()
@@ -249,7 +249,7 @@ class WFG2(_WFGBase):
 
         # t2: non-separable reduction on distance params (pairs)
         t2_pos = t1[:, :k].copy()
-        l_half = l // 2
+        l_half = distance_count // 2
         t2_dist = np.zeros((N, l_half))
         for i in range(l_half):
             t2_dist[:, i] = _r_nonsep(t1[:, k + 2*i:k + 2*i + 2], 2)
@@ -283,12 +283,12 @@ class WFG3(_WFGBase):
 
     def _evaluate(self, X: np.ndarray):
         y = self._normalise_z(X)
-        N, k, l, M = y.shape[0], self._k, self._l, self.n_obj
+        N, k, distance_count, M = y.shape[0], self._k, self._l, self.n_obj
 
         t1 = y.copy()
         t1[:, k:] = _s_linear(y[:, k:], 0.35)
 
-        l_half = l // 2
+        l_half = distance_count // 2
         t2_pos = t1[:, :k].copy()
         t2_dist = np.zeros((N, l_half))
         for i in range(l_half):
@@ -320,7 +320,7 @@ class WFG4(_WFGBase):
 
     def _evaluate(self, X: np.ndarray):
         y = self._normalise_z(X)
-        N, k, l, M = y.shape[0], self._k, self._l, self.n_obj
+        N, k, M = y.shape[0], self._k, self.n_obj
 
         # t1: multi-modal shift
         t1 = _s_multi(y, 30, 10.0, 0.35)
@@ -348,7 +348,7 @@ class WFG5(_WFGBase):
 
     def _evaluate(self, X: np.ndarray):
         y = self._normalise_z(X)
-        N, k, l, M = y.shape[0], self._k, self._l, self.n_obj
+        N, k, M = y.shape[0], self._k, self.n_obj
 
         t1 = _s_decept(y, 0.35, 0.001, 0.05)
 
@@ -374,7 +374,7 @@ class WFG6(_WFGBase):
 
     def _evaluate(self, X: np.ndarray):
         y = self._normalise_z(X)
-        N, k, l, M = y.shape[0], self._k, self._l, self.n_obj
+        N, k, distance_count, M = y.shape[0], self._k, self._l, self.n_obj
 
         t1 = y.copy()
         t1[:, k:] = _s_linear(y[:, k:], 0.35)
@@ -385,7 +385,7 @@ class WFG6(_WFGBase):
             start = i * items_per_group
             end = (i + 1) * items_per_group
             t2[:, i] = _r_nonsep(t1[:, start:end], items_per_group)
-        t2[:, -1] = _r_nonsep(t1[:, k:], l)
+        t2[:, -1] = _r_nonsep(t1[:, k:], distance_count)
 
         A = np.ones(M - 1)
         x = self._compute_x(t2, A)
@@ -400,7 +400,7 @@ class WFG7(_WFGBase):
 
     def _evaluate(self, X: np.ndarray):
         y = self._normalise_z(X)
-        N, k, l, M = y.shape[0], self._k, self._l, self.n_obj
+        N, k, M = y.shape[0], self._k, self.n_obj
 
         # FIX(audit B4): implement WFG7's parameter-dependent bias correctly.
         # The old code had a loop whose output was immediately overwritten by a
@@ -438,7 +438,7 @@ class WFG8(_WFGBase):
 
     def _evaluate(self, X: np.ndarray):
         y = self._normalise_z(X)
-        N, k, l, M = y.shape[0], self._k, self._l, self.n_obj
+        N, k, distance_count, M = y.shape[0], self._k, self._l, self.n_obj
 
         # t1: parameter-dependent bias for distance params (b_param, not b_poly)
         t1 = y.copy()
@@ -455,7 +455,7 @@ class WFG8(_WFGBase):
             start = i * items_per_group
             end = (i + 1) * items_per_group
             t2[:, i] = _r_nonsep(t1[:, start:end], items_per_group)
-        t2[:, -1] = _r_nonsep(t1[:, k:], l)
+        t2[:, -1] = _r_nonsep(t1[:, k:], distance_count)
 
         A = np.ones(M - 1)
         x = self._compute_x(t2, A)
@@ -470,7 +470,7 @@ class WFG9(_WFGBase):
 
     def _evaluate(self, X: np.ndarray):
         y = self._normalise_z(X)
-        N, k, l, M = y.shape[0], self._k, self._l, self.n_obj
+        N, k, distance_count, M = y.shape[0], self._k, self._l, self.n_obj
 
         # t1: parameter-dependent bias (b_param; shift depends on later params)
         t1 = y.copy()
@@ -491,7 +491,7 @@ class WFG9(_WFGBase):
             start = i * items_per_group
             end = (i + 1) * items_per_group
             t3[:, i] = _r_nonsep(t2[:, start:end], items_per_group)
-        t3[:, -1] = _r_nonsep(t2[:, k:], l)
+        t3[:, -1] = _r_nonsep(t2[:, k:], distance_count)
 
         A = np.ones(M - 1)
         x = self._compute_x(t3, A)

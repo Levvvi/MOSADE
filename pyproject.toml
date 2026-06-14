@@ -1,27 +1,61 @@
 [build-system]
-requires = ["setuptools>=68.0", "wheel"]
+requires = ["setuptools>=77.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "mosade"
 version = "0.1.0"
 description = "MOSADE: Multi-Objective Self-Adaptive Differential Evolution"
+readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Li Jiawei" },
+]
+keywords = [
+    "multi-objective optimization",
+    "evolutionary algorithms",
+    "differential evolution",
+    "MOSADE",
+    "constrained optimization",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
     "numpy>=1.24",
     "pyyaml>=6.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/Levvvi/MOSADE"
+Repository = "https://github.com/Levvvi/MOSADE"
+Issues = "https://github.com/Levvvi/MOSADE/issues"
+
 [project.optional-dependencies]
 dev = [
+    "build>=1.2",
     "pytest>=7.0",
     "pytest-cov>=4.0",
+    "ruff>=0.6.0",
 ]
 analysis = [
     "matplotlib>=3.9",  # Axes.boxplot(tick_labels=) and Colormap.with_extremes()
     "scipy>=1.10",
     "pandas>=2.0",
+]
+baselines = [
+    "pymoo>=0.6.1",
 ]
 
 # Only the shippable `mosade` library under src/ is packaged into the wheel.
@@ -41,6 +75,23 @@ pythonpath = ["src", "experiments"]
 [tool.coverage.run]
 source = ["src/mosade"]
 
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
 [tool.ruff]
+exclude = [
+    "experiments",
+    "build",
+    "dist",
+    ".eggs",
+    "*.egg-info",
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "htmlcov",
+]
 line-length = 100
 target-version = "py310"
