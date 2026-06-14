@@ -13,9 +13,10 @@ import argparse
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # experiments/ for mosade_experiments
 
-from mosade.analysis.merge import merge_results_dirs  # noqa: E402
+from mosade_experiments.analysis.merge import merge_results_dirs  # noqa: E402
 from mosade.utils.io import make_run_dir  # noqa: E402
 
 

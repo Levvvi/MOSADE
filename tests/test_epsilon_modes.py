@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from mosade.algorithm.mosade import MOSADE
-from mosade.analysis.tables import generate_main_results_table, generate_settings_table
+from mosade_experiments.analysis.tables import generate_main_results_table, generate_settings_table
 from mosade.problems.base import Problem
 from mosade.runner.experiment import run_experiment
 

@@ -36,9 +36,10 @@ import sys
 import textwrap
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # experiments/ for mosade_experiments
 
-from mosade.analysis.sensitivity import (  # noqa: E402
+from mosade_experiments.analysis.sensitivity import (  # noqa: E402
     format_sensitivity_table,
     plot_sensitivity,
 )

@@ -7,7 +7,7 @@ Requires matplotlib (``pip install mosade[analysis]``) for plotting.
 
 Typical workflow::
 
-    from mosade.analysis.sensitivity import plot_sensitivity, format_sensitivity_table
+    from mosade_experiments.analysis.sensitivity import plot_sensitivity, format_sensitivity_table
 
     # result_dirs[i] is the experiment output directory for param_value[i]
     result_dirs = [

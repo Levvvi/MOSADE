@@ -32,7 +32,7 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 # Ensure the src/ package is importable when executed as a script.
 # ---------------------------------------------------------------------------
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "src"))
 
 from mosade.runner.experiment import run_experiment  # noqa: E402
 from mosade.utils.io import load_config, save_json  # noqa: E402

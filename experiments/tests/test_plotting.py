@@ -1,4 +1,4 @@
-"""Tests for mosade.analysis.plotting — new functions added in this session.
+"""Tests for mosade_experiments.analysis.plotting — new functions added in this session.
 
 All tests use the Agg (non-interactive) backend, so they run without a display.
 Each test that exercises a plotting function checks that the output file is
@@ -39,7 +39,7 @@ def _write_results_config(
 # ---------------------------------------------------------------------------
 
 def test_imports():
-    from mosade.analysis.plotting import (
+    from mosade_experiments.analysis.plotting import (
         algorithm_display_name,
         compute_rank_table,
         plot_epsilon_feasibility,
@@ -147,7 +147,7 @@ def unconstrained_history():
 # ---------------------------------------------------------------------------
 
 def test_display_helpers():
-    from mosade.analysis.plotting import algorithm_display_name, problem_display_label
+    from mosade_experiments.analysis.plotting import algorithm_display_name, problem_display_label
 
     assert algorithm_display_name("MOEAD") == "MOEA/D"
     assert algorithm_display_name("MOEAD_DE") == "MOEA/D-DE"
@@ -164,21 +164,21 @@ def test_display_helpers():
 
 class TestPlotMultiAlgorithmPF:
     def test_creates_file(self, two_algo_pf_data, tmp_path):
-        from mosade.analysis.plotting import plot_multi_algorithm_pf
+        from mosade_experiments.analysis.plotting import plot_multi_algorithm_pf
         results_dict, pf = two_algo_pf_data
         out = tmp_path / "pf_multi.png"
         plot_multi_algorithm_pf(results_dict, pf, title="Test", save_path=out)
         assert out.exists() and out.stat().st_size > 0
 
     def test_no_pf(self, two_algo_pf_data, tmp_path):
-        from mosade.analysis.plotting import plot_multi_algorithm_pf
+        from mosade_experiments.analysis.plotting import plot_multi_algorithm_pf
         results_dict, _ = two_algo_pf_data
         out = tmp_path / "pf_no_ref.png"
         plot_multi_algorithm_pf(results_dict, PF=None, save_path=out)
         assert out.exists()
 
     def test_single_algorithm(self, tmp_path):
-        from mosade.analysis.plotting import plot_multi_algorithm_pf
+        from mosade_experiments.analysis.plotting import plot_multi_algorithm_pf
         F = np.array([[0.1, 0.9], [0.5, 0.5], [0.9, 0.1]])
         out = tmp_path / "pf_single.png"
         plot_multi_algorithm_pf({"MOSADE": F}, save_path=out)
@@ -191,7 +191,7 @@ class TestPlotMultiAlgorithmPF:
 
 class TestPlotMultiAlgorithmConvergence:
     def test_creates_file(self, convergence_dict, tmp_path):
-        from mosade.analysis.plotting import plot_multi_algorithm_convergence
+        from mosade_experiments.analysis.plotting import plot_multi_algorithm_convergence
         out = tmp_path / "convergence.png"
         plot_multi_algorithm_convergence(
             convergence_dict, metric_key="hv", save_path=out
@@ -199,14 +199,14 @@ class TestPlotMultiAlgorithmConvergence:
         assert out.exists() and out.stat().st_size > 0
 
     def test_empty_runs_skipped(self, tmp_path):
-        from mosade.analysis.plotting import plot_multi_algorithm_convergence
+        from mosade_experiments.analysis.plotting import plot_multi_algorithm_convergence
         data = {"MOSADE": [[], []]}  # all empty runs
         out = tmp_path / "convergence_empty.png"
         # Should not raise; may produce an empty figure
         plot_multi_algorithm_convergence(data, save_path=out)
 
     def test_missing_metric_key_skipped(self, convergence_dict, tmp_path):
-        from mosade.analysis.plotting import plot_multi_algorithm_convergence
+        from mosade_experiments.analysis.plotting import plot_multi_algorithm_convergence
         out = tmp_path / "convergence_missing.png"
         # "xyz" key is absent from all snapshots → runs are skipped silently
         plot_multi_algorithm_convergence(
@@ -220,13 +220,13 @@ class TestPlotMultiAlgorithmConvergence:
 
 class TestPlotGroupedBoxplots:
     def test_creates_file(self, grouped_box_data, tmp_path):
-        from mosade.analysis.plotting import plot_grouped_boxplots
+        from mosade_experiments.analysis.plotting import plot_grouped_boxplots
         out = tmp_path / "grouped.png"
         plot_grouped_boxplots(grouped_box_data, metric_name="HV", save_path=out)
         assert out.exists() and out.stat().st_size > 0
 
     def test_missing_algo_in_some_problems(self, tmp_path):
-        from mosade.analysis.plotting import plot_grouped_boxplots
+        from mosade_experiments.analysis.plotting import plot_grouped_boxplots
         data = {
             "ZDT1": {"MOSADE": [0.8, 0.82], "NSGA2": [0.75, 0.77]},
             "ZDT2": {"MOSADE": [0.7, 0.71]},  # NSGA2 absent
@@ -236,7 +236,7 @@ class TestPlotGroupedBoxplots:
         assert out.exists()
 
     def test_many_problems_rotates_labels(self, tmp_path):
-        from mosade.analysis.plotting import plot_grouped_boxplots
+        from mosade_experiments.analysis.plotting import plot_grouped_boxplots
         rng = np.random.default_rng(0)
         data = {f"P{i}": {"A": rng.uniform(0, 1, 5).tolist()} for i in range(8)}
         out = tmp_path / "grouped_many.png"
@@ -250,7 +250,7 @@ class TestPlotGroupedBoxplots:
 
 class TestPlotSuiteMetricGrid:
     def test_creates_png_and_svg(self, grouped_box_data, tmp_path):
-        from mosade.analysis.plotting import plot_suite_metric_grid
+        from mosade_experiments.analysis.plotting import plot_suite_metric_grid
 
         out = tmp_path / "ZDT_hv_grid.png"
         plot_suite_metric_grid("ZDT", grouped_box_data, metric_name="HV", save_path=out)
@@ -265,13 +265,13 @@ class TestPlotSuiteMetricGrid:
 
 class TestPlotRankHeatmap:
     def test_creates_file(self, rank_table_dict, tmp_path):
-        from mosade.analysis.plotting import plot_rank_heatmap
+        from mosade_experiments.analysis.plotting import plot_rank_heatmap
         out = tmp_path / "heatmap.png"
         plot_rank_heatmap(rank_table_dict, title="Rank Test", save_path=out)
         assert out.exists() and out.stat().st_size > 0
 
     def test_two_algo_two_problem(self, tmp_path):
-        from mosade.analysis.plotting import plot_rank_heatmap
+        from mosade_experiments.analysis.plotting import plot_rank_heatmap
         rt = {"ZDT1": {"A": 1.0, "B": 2.0}, "ZDT2": {"A": 2.0, "B": 1.0}}
         out = tmp_path / "heatmap_small.png"
         plot_rank_heatmap(rt, save_path=out)
@@ -279,7 +279,7 @@ class TestPlotRankHeatmap:
 
     def test_pandas_dataframe_accepted(self, rank_table_dict, tmp_path):
         pd = pytest.importorskip("pandas")
-        from mosade.analysis.plotting import plot_rank_heatmap
+        from mosade_experiments.analysis.plotting import plot_rank_heatmap
         df = pd.DataFrame(rank_table_dict).T  # rows=problems, cols=algos
         out = tmp_path / "heatmap_df.png"
         plot_rank_heatmap(df, save_path=out)
@@ -292,19 +292,19 @@ class TestPlotRankHeatmap:
 
 class TestPlotEpsilonFeasibility:
     def test_creates_file(self, mosade_history, tmp_path):
-        from mosade.analysis.plotting import plot_epsilon_feasibility
+        from mosade_experiments.analysis.plotting import plot_epsilon_feasibility
         out = tmp_path / "eps_feas.png"
         plot_epsilon_feasibility(mosade_history, save_path=out)
         assert out.exists() and out.stat().st_size > 0
 
     def test_unconstrained_history_skipped(self, unconstrained_history, tmp_path):
-        from mosade.analysis.plotting import plot_epsilon_feasibility
+        from mosade_experiments.analysis.plotting import plot_epsilon_feasibility
         out = tmp_path / "unconstrained.png"
         plot_epsilon_feasibility(unconstrained_history, save_path=out)
         assert not out.exists()
 
     def test_missing_cv_series_returns_early(self, tmp_path):
-        from mosade.analysis.plotting import plot_epsilon_feasibility
+        from mosade_experiments.analysis.plotting import plot_epsilon_feasibility
         history = {
             "n_constr": 7,
             "gen": [1, 2, 3],
@@ -359,7 +359,7 @@ class TestPlotExperimentConstraintDynamics:
         np.savetxt(run_dir / "pareto_approximation.txt", raw[:2])
 
     def test_unconstrained_problem_skips_constraint_dynamics(self, tmp_path, unconstrained_history):
-        from mosade.analysis.plotting import plot_experiment_results
+        from mosade_experiments.analysis.plotting import plot_experiment_results
 
         self._write_single_algo_problem(tmp_path, "ZDT1", unconstrained_history)
         plot_experiment_results(tmp_path)
@@ -369,7 +369,7 @@ class TestPlotExperimentConstraintDynamics:
         assert not list((tmp_path / "plots").rglob("*epsilon_feasibility*"))
 
     def test_constrained_problem_generates_constraint_dynamics(self, tmp_path, mosade_history):
-        from mosade.analysis.plotting import plot_experiment_results
+        from mosade_experiments.analysis.plotting import plot_experiment_results
 
         self._write_single_algo_problem(tmp_path, "DASCMOP7_difficulty7", mosade_history, seed=7)
         plot_experiment_results(tmp_path)
@@ -430,7 +430,7 @@ class TestPlotExperimentSummaryLayout:
         (prob_dir / "summary.json").write_text(json.dumps(summary), encoding="utf-8")
 
     def test_multi_algo_outputs_summary_and_suite_dirs(self, tmp_path):
-        from mosade.analysis.plotting import plot_experiment_results
+        from mosade_experiments.analysis.plotting import plot_experiment_results
 
         metrics_a = {"MOSADE": (0.92, 0.08), "NSGA2": (0.84, 0.12), "MOEAD": (0.80, 0.15)}
         metrics_b = {"MOSADE": (0.89, 0.09), "NSGA2": (0.82, 0.14), "MOEAD": (0.79, 0.16)}
@@ -502,7 +502,7 @@ class TestPlotExperimentPFSelection:
         np.savetxt(run_dir / "pareto_approximation_decisions.txt", formal_points)
 
     def test_pf_selection_is_deterministic_across_repeated_generation(self, tmp_path):
-        from mosade.analysis.plotting import plot_experiment_results
+        from mosade_experiments.analysis.plotting import plot_experiment_results
 
         prob_dir = tmp_path / "ZDT3"
         prob_dir.mkdir()
@@ -552,7 +552,7 @@ class TestPlotExperimentPFSelection:
         assert first["selections"][0]["seed"] == 13
 
     def test_formal_pf_plot_uses_pareto_approximation_not_raw_objectives(self, tmp_path):
-        from mosade.analysis.plotting import plot_experiment_results
+        from mosade_experiments.analysis.plotting import plot_experiment_results
 
         prob_dir = tmp_path / "ZDT3"
         prob_dir.mkdir()
@@ -585,7 +585,7 @@ class TestPlotExperimentPFSelection:
         assert manifest["selections"][0]["selected_points_count"] == 2
 
     def test_more_than_max_algorithms_paginate_pf_overlay(self, tmp_path):
-        from mosade.analysis.plotting import plot_experiment_results
+        from mosade_experiments.analysis.plotting import plot_experiment_results
 
         prob_dir = tmp_path / "ZDT3"
         prob_dir.mkdir()
@@ -668,7 +668,7 @@ class TestComputeRankTable:
         (prob_dir / "summary.json").write_text(json.dumps(summary))
 
     def test_basic_ranking(self, tmp_path):
-        from mosade.analysis.plotting import compute_rank_table
+        from mosade_experiments.analysis.plotting import compute_rank_table
         # MOSADE has higher HV (better) on both problems
         self._make_summary(tmp_path, "ZDT1", {"MOSADE": 0.9, "NSGA2": 0.8, "MOEAD": 0.85})
         self._make_summary(tmp_path, "ZDT2", {"MOSADE": 0.88, "NSGA2": 0.75, "MOEAD": 0.80})
@@ -679,7 +679,7 @@ class TestComputeRankTable:
         assert rt["ZDT1"]["NSGA2"] == 3.0   # lowest HV → rank 3
 
     def test_igd_ranking_inverted(self, tmp_path):
-        from mosade.analysis.plotting import compute_rank_table
+        from mosade_experiments.analysis.plotting import compute_rank_table
         # Write explicit igd_median values: A=0.05 (better), B=0.10 (worse)
         prob_dir = tmp_path / "ZDT1"
         prob_dir.mkdir()
@@ -693,7 +693,7 @@ class TestComputeRankTable:
         assert rt["ZDT1"]["B"] == 2.0
 
     def test_single_algo_skipped(self, tmp_path):
-        from mosade.analysis.plotting import compute_rank_table
+        from mosade_experiments.analysis.plotting import compute_rank_table
         # Single-algo summary: top-level values are floats, not dicts
         prob_dir = tmp_path / "ZDT1"
         prob_dir.mkdir()
@@ -704,13 +704,13 @@ class TestComputeRankTable:
         assert "ZDT1" not in rt  # single-algo → excluded
 
     def test_plots_dir_ignored(self, tmp_path):
-        from mosade.analysis.plotting import compute_rank_table
+        from mosade_experiments.analysis.plotting import compute_rank_table
         (tmp_path / "plots").mkdir()
         rt = compute_rank_table(tmp_path)
         assert "plots" not in rt
 
     def test_higher_is_better_auto_detection(self, tmp_path):
-        from mosade.analysis.plotting import compute_rank_table
+        from mosade_experiments.analysis.plotting import compute_rank_table
         self._make_summary(tmp_path, "ZDT1", {"A": 0.9, "B": 0.7})
         rt_hv = compute_rank_table(tmp_path, metric_key="hv")   # higher=True
         rt_igd = compute_rank_table(tmp_path, metric_key="igd")  # higher=False (auto)
@@ -721,7 +721,7 @@ class TestComputeRankTable:
         assert rt_igd["ZDT1"]["A"] == 1.0
 
     def test_unsupported_entries_are_skipped(self, tmp_path):
-        from mosade.analysis.plotting import compute_rank_table, plot_rank_heatmap
+        from mosade_experiments.analysis.plotting import compute_rank_table, plot_rank_heatmap
 
         prob_dir = tmp_path / "DASCMOP7_difficulty7"
         prob_dir.mkdir()

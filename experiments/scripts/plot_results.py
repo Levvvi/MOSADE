@@ -9,10 +9,11 @@ import sys
 from pathlib import Path
 
 # Ensure src/ is on the path when running as a script
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # experiments/ for mosade_experiments
 
 import argparse
-from mosade.analysis.plotting import plot_experiment_results
+from mosade_experiments.analysis.plotting import plot_experiment_results
 
 
 def main() -> None:

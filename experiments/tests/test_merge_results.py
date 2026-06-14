@@ -89,9 +89,9 @@ class TestMergeResults:
         return result_dir
 
     def test_merge_results_dirs_support_tables_and_plots(self, tmp_path):
-        from mosade.analysis.merge import merge_results_dirs
-        from mosade.analysis.plotting import plot_experiment_results
-        from mosade.analysis.tables import generate_main_results_table, generate_ranking_table
+        from mosade_experiments.analysis.merge import merge_results_dirs
+        from mosade_experiments.analysis.plotting import plot_experiment_results
+        from mosade_experiments.analysis.tables import generate_main_results_table, generate_ranking_table
 
         src_zdt = self._write_source_result(
             tmp_path,
@@ -126,7 +126,7 @@ class TestMergeResults:
         assert (merged_dir / "plots" / "suites" / "WFG_hv_grid.png").exists()
 
     def test_merge_rejects_duplicate_problem_names(self, tmp_path):
-        from mosade.analysis.merge import merge_results_dirs
+        from mosade_experiments.analysis.merge import merge_results_dirs
 
         src_a = self._write_source_result(
             tmp_path,

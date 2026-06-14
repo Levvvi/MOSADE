@@ -9,7 +9,7 @@ from pathlib import Path
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "src"))
 
 from mosade.algorithm.registry import ALGORITHM_REGISTRY  # noqa: E402
 from mosade.problems.base import Problem  # noqa: E402
