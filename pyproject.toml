@@ -19,17 +19,27 @@ dev = [
     "pytest-cov>=4.0",
 ]
 analysis = [
-    "matplotlib>=3.7",
+    "matplotlib>=3.9",  # Axes.boxplot(tick_labels=) and Colormap.with_extremes()
     "scipy>=1.10",
     "pandas>=2.0",
 ]
 
+# Only the shippable `mosade` library under src/ is packaged into the wheel.
+# The thesis tooling in experiments/ (the `mosade_experiments` package) is
+# deliberately excluded from the distribution.
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["mosade*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+# experiments/ is on the import path so the top-level suite (which keeps
+# test_epsilon_modes.py) and `pytest experiments/tests/` can import the
+# mosade_experiments tooling, even though it is never installed into the wheel.
+pythonpath = ["src", "experiments"]
+
+[tool.coverage.run]
+source = ["src/mosade"]
 
 [tool.ruff]
 line-length = 100
