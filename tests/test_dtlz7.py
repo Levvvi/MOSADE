@@ -93,6 +93,13 @@ class TestDTLZ7:
         np.testing.assert_allclose(F[0], expected, atol=1e-12)
         np.testing.assert_allclose(CV, np.zeros(1))
 
+    def test_independent_golden_points(self):
+        p = DTLZ7(n_obj=3)
+        f0, _ = p.evaluate(np.zeros((1, p.n_var)))
+        f1, _ = p.evaluate(np.ones((1, p.n_var)))
+        np.testing.assert_allclose(f0[0], [0.0, 0.0, 6.0], atol=1e-9)
+        np.testing.assert_allclose(f1[0], [1.0, 1.0, 31.0], atol=1e-9)
+
     def test_pareto_front_is_deterministic_and_limited_to_requested_points(self):
         p = DTLZ7(n_obj=3)
 

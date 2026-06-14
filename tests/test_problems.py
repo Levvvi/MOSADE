@@ -164,3 +164,26 @@ class TestDTLZ4:
         # x1^100 is near 0 for most x1 in [0,1), so cos(x1^100 * pi/2) ≈ 1
         # meaning f1 ≈ 1, f2 ≈ 0 for most solutions
         assert np.mean(F[:, 0] > 0.9) > 0.8, "Most f1 should be near 1 with high alpha"
+
+
+class TestDTLZAnalyticalFronts:
+    """Covers the DTLZ1 and DTLZ2 analytical pareto_front paths."""
+
+    def test_dtlz1_pf_2obj_is_linear_simplex(self):
+        pf = DTLZ1(n_obj=2).pareto_front(100)
+        assert pf.shape == (100, 2)
+        np.testing.assert_allclose(pf.sum(axis=1), 0.5, atol=1e-9)
+
+    def test_dtlz1_pf_3obj_on_scaled_simplex(self):
+        pf = DTLZ1(n_obj=3).pareto_front(200)
+        assert pf.shape[1] == 3
+        np.testing.assert_allclose(pf.sum(axis=1), 0.5, atol=1e-9)
+        assert np.all(pf >= -1e-12)
+
+    def test_dtlz2_pf_2obj_on_unit_circle(self):
+        pf = DTLZ2(n_obj=2).pareto_front(100)
+        assert pf.shape == (100, 2)
+        np.testing.assert_allclose(np.sqrt((pf**2).sum(axis=1)), 1.0, atol=1e-10)
+
+    def test_dtlz2_pf_3obj_returns_none(self):
+        assert DTLZ2(n_obj=3).pareto_front() is None

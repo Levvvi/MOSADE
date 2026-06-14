@@ -44,6 +44,8 @@ private/
 # Generated/intermediate working directories
 tmp/
 temp/
+.coverage
+htmlcov/
 .pytest_cache/
 
 # Rendered document pages and final document work products
