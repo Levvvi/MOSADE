@@ -54,6 +54,8 @@ from mosade.algorithm.strategies import (
     mutate_rand_1,
     polynomial_mutation,
 )
+from mosade.metrics.hypervolume import hypervolume
+from mosade.metrics.igd import igd as compute_igd
 from mosade.problems.base import Problem
 from mosade.utils.seeding import get_rng
 
@@ -91,6 +93,8 @@ class MOEAD:
         Binomial crossover rate.  Default: 1.0 (recommended for MOEA/D-DE).
     mutation_eta : float
         Polynomial mutation distribution index.  Default: 20.0.
+    track_interval : int
+        Evaluation interval for optional HV/IGD convergence snapshots.
     """
 
     def __init__(
@@ -103,6 +107,7 @@ class MOEAD:
         F: float = 0.5,
         CR: float = 1.0,
         mutation_eta: float = 20.0,
+        track_interval: int = 0,
         **_extra: Any,  # absorb unknown YAML keys gracefully
     ) -> None:
         self.pop_size = pop_size
@@ -113,6 +118,7 @@ class MOEAD:
         self.F = F
         self.CR = CR
         self.mutation_eta = mutation_eta
+        self.track_interval = track_interval
 
     # ------------------------------------------------------------------
     # Main entry point
@@ -131,11 +137,10 @@ class MOEAD:
         problem : Problem
             The optimisation problem to solve.
         pf : ndarray or None
-            True Pareto front.  MOEA/D does not use this internally; the
-            parameter exists for API compatibility with the experiment runner.
+            True Pareto front.  When provided and ``track_interval > 0``, IGD is
+            computed at each snapshot.
         ref_point : ndarray or None
-            Ignored. Present for interface compatibility with the experiment
-            runner and convergence-aware algorithms.
+            Shared hypervolume reference point used for convergence tracking.
 
         Returns
         -------
@@ -177,6 +182,9 @@ class MOEAD:
 
         # --- Main loop ---
         history: dict[str, list] = {"gen": [], "n_evals": []}
+        if self.track_interval > 0:
+            history["convergence"] = []
+        _last_track_evals = 0
         gen = 0
 
         while problem.n_evals < self.max_evals:
@@ -247,6 +255,13 @@ class MOEAD:
 
             history["gen"].append(gen)
             history["n_evals"].append(problem.n_evals)
+            if self.track_interval > 0 and (
+                problem.n_evals - _last_track_evals >= self.track_interval
+            ):
+                history["convergence"].append(
+                    _convergence_snapshot(F_pop, CV_pop, problem.n_evals, pf, ref_point)
+                )
+                _last_track_evals = problem.n_evals
 
         # --- Extract final nondominated feasible front ---
         feas_mask = CV_pop <= 0.0
@@ -319,6 +334,38 @@ def _preferred(
     g_new = float(tchebycheff(f_new, weight, z_ideal))
     g_old = float(tchebycheff(f_old, weight, z_ideal))
     return g_new <= g_old
+
+
+def _convergence_snapshot(
+    F: np.ndarray,
+    CV: np.ndarray,
+    n_evals: int,
+    pf: np.ndarray | None,
+    ref_point: np.ndarray | None,
+) -> dict[str, object]:
+    """Compute HV/IGD from the current strictly feasible nondominated set."""
+    feasible = F[CV <= 0.0]
+    if feasible.size == 0:
+        F_nd = np.empty((0, F.shape[1]), dtype=float)
+    else:
+        nd_mask = nondominated_mask(feasible)
+        F_nd = feasible[nd_mask]
+
+    ref = ref_point if ref_point is not None else _safe_reference_point_from_maxima(F)
+    hv_val = float(hypervolume(F_nd, np.asarray(ref, dtype=float))) if F_nd.size else 0.0
+
+    igd_val: float | None = None
+    if pf is not None and F_nd.size:
+        igd_val = float(compute_igd(F_nd, pf))
+
+    return {"n_evals": int(n_evals), "hv": hv_val, "igd": igd_val}
+
+
+def _safe_reference_point_from_maxima(F: np.ndarray) -> np.ndarray:
+    """Return a minimisation HV reference point from objective maxima."""
+    maxima = np.max(np.asarray(F, dtype=float), axis=0)
+    margin = np.maximum(1e-6, 0.1 * np.maximum(np.abs(maxima), 1.0))
+    return maxima + margin
 
 
 def _sample_three(

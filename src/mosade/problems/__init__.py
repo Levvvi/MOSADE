@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from mosade.problems.base import Problem
 from mosade.problems.zdt import ZDT1, ZDT2, ZDT3, ZDT4, ZDT6
-from mosade.problems.dtlz import DTLZ1, DTLZ2, DTLZ3, DTLZ4
+from mosade.problems.dtlz import DTLZ1, DTLZ2, DTLZ3, DTLZ4, DTLZ7
 from mosade.problems.wfg import WFG1, WFG2, WFG3, WFG4, WFG5, WFG6, WFG7, WFG8, WFG9
 from mosade.problems.dascmop import (
     DASCMOP1, DASCMOP2, DASCMOP3, DASCMOP4, DASCMOP5, DASCMOP6,
@@ -15,7 +15,7 @@ from mosade.problems.realworld_cre import CRE21, CRE22, CRE23, CRE31, CRE32
 __all__ = [
     "Problem",
     "ZDT1", "ZDT2", "ZDT3", "ZDT4", "ZDT6",
-    "DTLZ1", "DTLZ2", "DTLZ3", "DTLZ4",
+    "DTLZ1", "DTLZ2", "DTLZ3", "DTLZ4", "DTLZ7",
     "WFG1", "WFG2", "WFG3", "WFG4", "WFG5", "WFG6", "WFG7", "WFG8", "WFG9",
     "DASCMOP1", "DASCMOP2", "DASCMOP3", "DASCMOP4", "DASCMOP5", "DASCMOP6",
     "DASCMOP7", "DASCMOP8", "DASCMOP9",
@@ -26,6 +26,7 @@ __all__ = [
 PROBLEM_REGISTRY: dict[str, type[Problem]] = {
     "ZDT1": ZDT1, "ZDT2": ZDT2, "ZDT3": ZDT3, "ZDT4": ZDT4, "ZDT6": ZDT6,
     "DTLZ1": DTLZ1, "DTLZ2": DTLZ2, "DTLZ3": DTLZ3, "DTLZ4": DTLZ4,
+    "DTLZ7": DTLZ7,
     "WFG1": WFG1, "WFG2": WFG2, "WFG3": WFG3, "WFG4": WFG4, "WFG5": WFG5,
     "WFG6": WFG6, "WFG7": WFG7, "WFG8": WFG8, "WFG9": WFG9,
     "DASCMOP1": DASCMOP1, "DASCMOP2": DASCMOP2, "DASCMOP3": DASCMOP3,

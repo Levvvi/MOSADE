@@ -135,7 +135,10 @@ def _fe_to_threshold(
         return None
     threshold = fraction * final_hv
     for entry in convergence_history:
-        if entry["hv"] >= threshold:
+        hv = entry.get("hv")
+        if hv is None or not np.isfinite(float(hv)):
+            continue
+        if float(hv) >= threshold:
             return entry["n_evals"]
     return None
 
@@ -530,7 +533,14 @@ def _build_run_metrics(
             "restart_count",
             "restart_generation_or_eval",
             "selection_mode",
+            "success_criterion",
+            "telemetry_schema_version",
             "deprecated_variant_label",
+            "adapt_fcr",
+            "adapt_by_success_rate",
+            "disable_credit",
+            "fixed_F",
+            "fixed_CR",
             "effective_pop_size",
         ):
             if key in metadata:
@@ -620,7 +630,14 @@ def _build_run_metadata(
         "restart_count": result_metadata.get("restart_count", "NA"),
         "restart_generation_or_eval": result_metadata.get("restart_generation_or_eval", "NA"),
         "selection_mode": result_metadata.get("selection_mode", "NA"),
+        "success_criterion": result_metadata.get("success_criterion", "NA"),
+        "telemetry_schema_version": result_metadata.get("telemetry_schema_version", "NA"),
         "deprecated_variant_label": result_metadata.get("deprecated_variant_label"),
+        "adapt_fcr": result_metadata.get("adapt_fcr", "NA"),
+        "adapt_by_success_rate": result_metadata.get("adapt_by_success_rate", "NA"),
+        "disable_credit": result_metadata.get("disable_credit", "NA"),
+        "fixed_F": result_metadata.get("fixed_F", "NA"),
+        "fixed_CR": result_metadata.get("fixed_CR", "NA"),
         "seed": int(seed),
         "budget": int(getattr(algo, "max_evals", result.n_evals)),
         "pop_size_requested": int(getattr(algo, "pop_size", -1)),
@@ -981,12 +998,21 @@ def run_experiment(
     save_json(run_dir / "config.json", cfg)
 
     problems = cfg.get("problems", ["ZDT1"])
-    n_runs = cfg.get("n_runs", 5)
+    configured_n_runs = cfg.get("n_runs")
+    n_runs = configured_n_runs if configured_n_runs is not None else 5
     base_seed = cfg.get("seed", 42)
     parallel_workers = int(workers if workers is not None else cfg.get("parallel_workers", 1))
 
     algo_configs, is_multi = _parse_algo_configs(cfg)
-    seeds = seed_sequence(base_seed, n_runs)
+    if "seeds" in cfg:
+        seeds = [int(seed) for seed in cfg["seeds"]]
+        if configured_n_runs is not None and int(configured_n_runs) != len(seeds):
+            raise ValueError(
+                f"n_runs={configured_n_runs} does not match len(seeds)={len(seeds)}"
+            )
+        n_runs = len(seeds)
+    else:
+        seeds = seed_sequence(base_seed, int(n_runs))
     _write_experiment_provenance(
         run_dir=run_dir,
         config_path=config_path,

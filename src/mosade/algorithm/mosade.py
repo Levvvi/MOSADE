@@ -39,6 +39,8 @@ from mosade.algorithm.decomposition import (
 )
 from mosade.algorithm.selection import (
     EpsilonConstraint,
+    constrained_nondominated_sort,
+    crowding_distance_by_front,
     dominates,
     nondominated_mask,
     select_dominance_survival,
@@ -65,10 +67,27 @@ log = logging.getLogger("mosade.algorithm")
 EpsilonMode = Literal["adaptive", "fixed_initial", "zero"]
 MemoryScope = Literal["per_strategy", "shared"]
 SelectionMode = Literal["decomposition", "dominance"]
+SuccessCriterion = Literal[
+    "current",
+    "dominance",
+    "rank_crowding",
+    "decomposition",
+    "feasibility_first",
+    "hvproxy",
+]
 
 EPS_MODES: frozenset[str] = frozenset({"adaptive", "fixed_initial", "zero"})
 MEMORY_SCOPES: frozenset[str] = frozenset({"per_strategy", "shared"})
 SELECTION_MODES: frozenset[str] = frozenset({"decomposition", "dominance"})
+SUCCESS_CRITERIA: frozenset[str] = frozenset({
+    "current",
+    "dominance",
+    "rank_crowding",
+    "decomposition",
+    "feasibility_first",
+    "hvproxy",
+})
+TELEMETRY_SCHEMA_VERSION = "sr_diagnosis_v1"
 
 
 # ---------------------------------------------------------------------------
@@ -194,6 +213,18 @@ class MOSADE:
         Whether stagnation-triggered restart is active.
     selection_mode : {"decomposition", "dominance"}
         Environmental survival rule.
+    success_criterion : {"current", "dominance", "rank_crowding", "decomposition",
+        "feasibility_first", "hvproxy"}
+        Diagnostic-only credit/success definition used by adaptation updates.
+        The default ``current`` preserves the original MOSADE behaviour.
+    adapt_fcr : bool
+        Whether successful offspring update the LSHADE F/CR memories and future
+        F/CR values are sampled from those memories.
+    adapt_by_success_rate : bool
+        Whether success credit updates strategy-selection probabilities.
+        When False, the selector remains at its initial uniform probabilities.
+    fixed_F, fixed_CR : float
+        Constants used when ``adapt_fcr`` is disabled.
     delta_min, delta_max : float
         Range for global/local mixing ratio schedule.
     stag_ratio : float
@@ -219,7 +250,12 @@ class MOSADE:
         memory_scope: MemoryScope = "per_strategy",
         restart_enabled: bool = True,
         selection_mode: SelectionMode = "decomposition",
+        success_criterion: SuccessCriterion = "current",
         deprecated_variant_label: str | None = None,
+        adapt_fcr: bool = True,
+        adapt_by_success_rate: bool = True,
+        fixed_F: float = 0.5,
+        fixed_CR: float = 0.5,
         delta_min: float = 0.1,
         delta_max: float = 0.9,
         stag_ratio: float = 0.1,
@@ -258,12 +294,22 @@ class MOSADE:
                 f"selection_mode must be one of {sorted(SELECTION_MODES)}, "
                 f"got {selection_mode!r}"
             )
+        if success_criterion not in SUCCESS_CRITERIA:
+            raise ValueError(
+                "success_criterion must be one of "
+                f"{sorted(SUCCESS_CRITERIA)}, got {success_criterion!r}"
+            )
         self.eps_mode = eps_mode
         self.disable_epsilon = self.eps_mode == "zero"
         self.memory_scope = memory_scope
         self.restart_enabled = restart_enabled
         self.selection_mode = selection_mode
+        self.success_criterion = success_criterion
         self.deprecated_variant_label = deprecated_variant_label
+        self.adapt_fcr = bool(adapt_fcr)
+        self.adapt_by_success_rate = bool(adapt_by_success_rate)
+        self.fixed_F = float(fixed_F)
+        self.fixed_CR = float(fixed_CR)
         self.delta_min = delta_min
         self.delta_max = delta_max
         self.stag_ratio = stag_ratio
@@ -350,10 +396,17 @@ class MOSADE:
 
         # --- LSHADE memories ---
         if self.memory_scope == "shared":
-            shared_memory = LSHADEMemory(H=self.memory_H)
+            shared_memory = LSHADEMemory(
+                H=self.memory_H,
+                init_F=self.fixed_F,
+                init_CR=self.fixed_CR,
+            )
             memories = [shared_memory for _ in range(NUM_STRATEGIES)]
         else:
-            memories = [LSHADEMemory(H=self.memory_H) for _ in range(NUM_STRATEGIES)]
+            memories = [
+                LSHADEMemory(H=self.memory_H, init_F=self.fixed_F, init_CR=self.fixed_CR)
+                for _ in range(NUM_STRATEGIES)
+            ]
 
         # --- Strategy selector ---
         selector = StrategySelector(window_size=self.lp, pi_min=self.pi_min)
@@ -407,17 +460,32 @@ class MOSADE:
             "memory_success_count_by_strategy": [],
             "memory_sampling_count_by_strategy": [],
             "selection_mode": self.selection_mode,
+            "success_criterion": self.success_criterion,
+            "telemetry_schema_version": TELEMETRY_SCHEMA_VERSION,
             "n_feasible_before_selection": [],
             "n_feasible_after_selection": [],
+            "population_nd_ratio": [],
+            "feasibility_ratio": [],
+            "mean_cv": [],
+            "median_cv": [],
+            "best_cv": [],
             "n_fronts": [],
             "truncation_method": [],
             "selection_tie_break_count": [],
+            "sampled_F_mean": [],
+            "sampled_F_std": [],
+            "sampled_CR_mean": [],
+            "sampled_CR_std": [],
+            "strategy_success_rates": [],
+            "success_rate_total": [],
+            "success_count_total": [],
+            "use_count_total": [],
             "n_constr": int(problem.n_constr),
+            "adapt_fcr": bool(self.adapt_fcr),
+            "adapt_by_success_rate": bool(self.adapt_by_success_rate),
+            "fixed_F": float(self.fixed_F),
+            "fixed_CR": float(self.fixed_CR),
         }
-        if problem.n_constr > 0:
-            history["feasibility_ratio"] = []
-            history["mean_cv"] = []
-            history["best_cv"] = []
         if self.track_interval > 0:
             history["convergence"] = []
         _last_track_evals: int = 0  # evals at which the last convergence snapshot was taken
@@ -462,12 +530,16 @@ class MOSADE:
             # 3*K (K = number of distinct strategies active this generation).
             F_params = np.empty(N)
             CR_params = np.empty(N)
-            for _k in range(NUM_STRATEGIES):
-                _idx_k = np.where(strat_assignments == _k)[0]
-                if _idx_k.size:
-                    _Fk, _CRk = memories[_k].sample_batch(_idx_k.size, rng)
-                    F_params[_idx_k] = _Fk
-                    CR_params[_idx_k] = _CRk
+            if self.adapt_fcr:
+                for _k in range(NUM_STRATEGIES):
+                    _idx_k = np.where(strat_assignments == _k)[0]
+                    if _idx_k.size:
+                        _Fk, _CRk = memories[_k].sample_batch(_idx_k.size, rng)
+                        F_params[_idx_k] = _Fk
+                        CR_params[_idx_k] = _CRk
+            else:
+                F_params.fill(self.fixed_F)
+                CR_params.fill(self.fixed_CR)
 
             # Step 3: pre-compute global/local pool choice (one batch of N draws).
             use_global = rng.random(N) < delta
@@ -612,6 +684,11 @@ class MOSADE:
                 [] for _ in range(NUM_STRATEGIES)
             ]
             success_counts = np.zeros(NUM_STRATEGIES, dtype=int)
+            rank_crowding_ranks: np.ndarray | None = None
+            rank_crowding_cd: np.ndarray | None = None
+            if self.success_criterion == "rank_crowding":
+                rank_crowding_ranks = constrained_nondominated_sort(F_all, CV_all)
+                rank_crowding_cd = crowding_distance_by_front(F_all, rank_crowding_ranks)
 
             for j in range(N):
                 chosen = sel_idx[j]
@@ -626,17 +703,21 @@ class MOSADE:
                     # loop order (meta[j]["parent"] == j).
                     parent_j = m["parent"]
 
-                    g_parent = float(
-                        tchebycheff(state.F[parent_j], state.weights[j], state.z_ideal)
+                    credit, delta_g, dom_bonus = self._success_credit(
+                        criterion=self.success_criterion,
+                        parent_F=state.F[parent_j],
+                        parent_CV=state.CV[parent_j],
+                        child_F=F_U[offspring_idx],
+                        child_CV=CV_U[offspring_idx],
+                        weight=state.weights[j],
+                        z_ideal=state.z_ideal,
+                        F_all=F_all,
+                        CV_all=CV_all,
+                        parent_idx=parent_j,
+                        child_idx=N + offspring_idx,
+                        ranks=rank_crowding_ranks,
+                        crowding=rank_crowding_cd,
                     )
-                    g_child = float(
-                        tchebycheff(F_U[offspring_idx], state.weights[j], state.z_ideal)
-                    )
-                    delta_g = max(0.0, g_parent - g_child)
-                    dom_bonus = (
-                        0.5 if dominates(F_U[offspring_idx], state.F[parent_j]) else 0.0
-                    )
-                    credit = delta_g + dom_bonus
 
                     credits[strat] += credit
                     credits_dg[strat] += delta_g
@@ -663,23 +744,28 @@ class MOSADE:
             # ---------------------------------------------------------------
             # Update LSHADE memories and strategy probabilities.
             # ---------------------------------------------------------------
-            if self.memory_scope == "shared":
-                pooled = [item for strat_items in success_params for item in strat_items]
-                if pooled:
-                    memories[0].update(
-                        [t[0] for t in pooled],
-                        [t[1] for t in pooled],
-                        [t[2] for t in pooled],
-                    )
-            else:
-                for k in range(NUM_STRATEGIES):
-                    if success_params[k]:
-                        sf = [t[0] for t in success_params[k]]
-                        scr = [t[1] for t in success_params[k]]
-                        w = [t[2] for t in success_params[k]]
-                        memories[k].update(sf, scr, w)
+            if self.adapt_fcr:
+                if self.memory_scope == "shared":
+                    pooled = [item for strat_items in success_params for item in strat_items]
+                    if pooled:
+                        memories[0].update(
+                            [t[0] for t in pooled],
+                            [t[1] for t in pooled],
+                            [t[2] for t in pooled],
+                        )
+                else:
+                    for k in range(NUM_STRATEGIES):
+                        if success_params[k]:
+                            sf = [t[0] for t in success_params[k]]
+                            scr = [t[1] for t in success_params[k]]
+                            w = [t[2] for t in success_params[k]]
+                            memories[k].update(sf, scr, w)
 
-            if not self.disable_credit and self.fixed_strategy is None:
+            if (
+                self.adapt_by_success_rate
+                and not self.disable_credit
+                and self.fixed_strategy is None
+            ):
                 selector.update(credits)
 
             # ---------------------------------------------------------------
@@ -770,6 +856,21 @@ class MOSADE:
                 if state.archive.is_empty
                 else int(state.archive.get_objectives().shape[0])
             )
+            feasible_mask = state.CV <= 0.0
+            if np.any(feasible_mask):
+                nd_mask = nondominated_mask(state.F[feasible_mask])
+                population_nd_ratio = float(np.sum(nd_mask) / N)
+            else:
+                nd_mask = nondominated_mask(state.F)
+                population_nd_ratio = float(np.sum(nd_mask) / N)
+            strategy_success_rates = np.divide(
+                success_counts,
+                strat_use_counts,
+                out=np.zeros(NUM_STRATEGIES, dtype=float),
+                where=strat_use_counts > 0,
+            )
+            total_uses = int(np.sum(strat_use_counts))
+            total_successes = int(np.sum(success_counts))
 
             history["gen"].append(gen)
             history["n_evals"].append(problem.n_evals)
@@ -781,6 +882,16 @@ class MOSADE:
             history["strategy_credit_dom"].append(credits_dom.tolist())
             history["memory_F_mean"].append([mem.mean_F for mem in memories])
             history["memory_CR_mean"].append([mem.mean_CR for mem in memories])
+            history["sampled_F_mean"].append(float(np.mean(F_params)))
+            history["sampled_F_std"].append(float(np.std(F_params, ddof=0)))
+            history["sampled_CR_mean"].append(float(np.mean(CR_params)))
+            history["sampled_CR_std"].append(float(np.std(CR_params, ddof=0)))
+            history["strategy_success_rates"].append(strategy_success_rates.tolist())
+            history["success_rate_total"].append(
+                float(total_successes / total_uses) if total_uses > 0 else 0.0
+            )
+            history["success_count_total"].append(total_successes)
+            history["use_count_total"].append(total_uses)
             history["best_scal"].append(current_best_scal)
             history["median_scal"].append(median_scal)
             history["delta"].append(float(delta))
@@ -795,15 +906,16 @@ class MOSADE:
             history["memory_sampling_count_by_strategy"].append(strat_use_counts.tolist())
             history["n_feasible_before_selection"].append(n_feasible_before_selection)
             history["n_feasible_after_selection"].append(n_feasible_after_selection)
+            history["population_nd_ratio"].append(population_nd_ratio)
+            history["feasibility_ratio"].append(float(np.mean(state.CV <= 0.0)))
+            history["mean_cv"].append(float(np.mean(state.CV)))
+            history["median_cv"].append(float(np.median(state.CV)))
+            history["best_cv"].append(float(np.min(state.CV)))
             history["n_fronts"].append(int(selection_meta.get("n_fronts", 0)))
             history["truncation_method"].append(str(selection_meta.get("truncation_method", "")))
             history["selection_tie_break_count"].append(
                 int(selection_meta.get("selection_tie_break_count", 0))
             )
-            if problem.n_constr > 0:
-                history["feasibility_ratio"].append(float(np.mean(state.CV <= 0.0)))
-                history["mean_cv"].append(float(np.mean(state.CV)))
-                history["best_cv"].append(float(np.min(state.CV)))
 
             # ---------------------------------------------------------------
             # Convergence tracking (optional).
@@ -886,7 +998,14 @@ class MOSADE:
                 "restart_count": int(restart_count),
                 "restart_generation_or_eval": history["restart_events"],
                 "selection_mode": self.selection_mode,
+                "success_criterion": self.success_criterion,
+                "telemetry_schema_version": TELEMETRY_SCHEMA_VERSION,
                 "deprecated_variant_label": self.deprecated_variant_label,
+                "adapt_fcr": bool(self.adapt_fcr),
+                "adapt_by_success_rate": bool(self.adapt_by_success_rate),
+                "disable_credit": bool(self.disable_credit),
+                "fixed_F": float(self.fixed_F),
+                "fixed_CR": float(self.fixed_CR),
                 "effective_pop_size": int(N),
                 "n_weights": int(N),
                 "n_obj": int(M),
@@ -929,6 +1048,98 @@ class MOSADE:
             return
         if self.eps_mode == "zero" and abs(epsilon) > 1e-12:
             raise RuntimeError("zero epsilon mode is not zero")
+
+    @staticmethod
+    def _success_credit(
+        criterion: str,
+        parent_F: np.ndarray,
+        parent_CV: float,
+        child_F: np.ndarray,
+        child_CV: float,
+        weight: np.ndarray,
+        z_ideal: np.ndarray,
+        F_all: np.ndarray,
+        CV_all: np.ndarray,
+        parent_idx: int,
+        child_idx: int,
+        ranks: np.ndarray | None = None,
+        crowding: np.ndarray | None = None,
+    ) -> tuple[float, float, float]:
+        """Return diagnostic adaptation credit and component telemetry.
+
+        The default ``current`` criterion is the original ScienceN MOSADE
+        success signal: Tchebycheff improvement plus a Pareto-dominance bonus.
+        Other criteria are diagnostic-only alternatives used to test whether
+        the success signal is misaligned with multi-objective progress.
+        """
+        g_parent = float(tchebycheff(parent_F, weight, z_ideal))
+        g_child = float(tchebycheff(child_F, weight, z_ideal))
+        delta_g = max(0.0, g_parent - g_child)
+        dom_bonus = 0.5 if dominates(child_F, parent_F) else 0.0
+
+        if criterion == "current":
+            return delta_g + dom_bonus, delta_g, dom_bonus
+
+        parent_feasible = parent_CV <= 0.0
+        child_feasible = child_CV <= 0.0
+
+        if criterion == "decomposition":
+            return delta_g, delta_g, 0.0
+
+        if criterion == "dominance":
+            if child_feasible and not parent_feasible:
+                credit = 1.0 + max(0.0, float(parent_CV - child_CV))
+            elif not child_feasible and not parent_feasible:
+                credit = max(0.0, float(parent_CV - child_CV))
+            elif child_feasible and parent_feasible and dominates(child_F, parent_F):
+                credit = 1.0
+            else:
+                credit = 0.0
+            return credit, credit, 1.0 if credit > 0.0 else 0.0
+
+        if criterion == "feasibility_first":
+            cv_delta = max(0.0, float(parent_CV - child_CV))
+            if child_feasible and not parent_feasible:
+                credit = 1.0 + cv_delta
+            elif not child_feasible and not parent_feasible:
+                credit = cv_delta
+            else:
+                credit = delta_g + dom_bonus
+            return credit, delta_g, cv_delta
+
+        if criterion == "rank_crowding":
+            if ranks is None or crowding is None:
+                return delta_g + dom_bonus, delta_g, dom_bonus
+            parent_rank = int(ranks[parent_idx])
+            child_rank = int(ranks[child_idx])
+            parent_cd = float(crowding[parent_idx])
+            child_cd = float(crowding[child_idx])
+            if child_rank < parent_rank:
+                credit = float(parent_rank - child_rank + 1)
+            elif child_rank == parent_rank and child_cd > parent_cd:
+                if np.isinf(child_cd) and not np.isinf(parent_cd):
+                    credit = 1.0
+                else:
+                    credit = max(1e-6, child_cd - parent_cd)
+            else:
+                credit = 0.0
+            return credit, delta_g, 1.0 if credit > 0.0 else 0.0
+
+        if criterion == "hvproxy":
+            # Cheap minimisation proxy: reward objective-wise movement toward
+            # the ideal point, with feasibility handled before objective gains.
+            cv_delta = max(0.0, float(parent_CV - child_CV))
+            if child_feasible and not parent_feasible:
+                credit = 1.0 + cv_delta
+            elif not child_feasible and not parent_feasible:
+                credit = cv_delta
+            else:
+                scale = np.maximum(np.abs(z_ideal), 1.0)
+                improvement = np.maximum(0.0, (parent_F - child_F) / scale)
+                credit = float(np.sum(improvement))
+            return credit, delta_g, cv_delta
+
+        raise ValueError(f"Unknown success_criterion: {criterion!r}")
 
     @staticmethod
     def _pick_random(
@@ -1094,15 +1305,14 @@ class MOSADE:
         dict with keys ``n_evals`` (int), ``hv`` (float), ``igd`` (float or None).
         """
         # Feasibility mask: CV == 0 (strictly feasible).
-        feasible_mask = state.CV == 0.0
+        feasible_mask = state.CV <= 0.0
         if feasible_mask.any():
             F_feas = state.F[feasible_mask]
             nd_mask = nondominated_mask(F_feas)
             F_nd = F_feas[nd_mask]
         else:
             # No feasible solutions yet — use all nondominated (for constrained runs).
-            nd_mask = nondominated_mask(state.F)
-            F_nd = state.F[nd_mask]
+            F_nd = np.empty((0, state.F.shape[1]), dtype=float)
 
         ref = (
             ref_point

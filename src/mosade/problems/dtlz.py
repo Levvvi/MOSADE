@@ -156,3 +156,85 @@ class DTLZ4(Problem):
             F[:, i] = f
 
         return F, None
+
+
+class DTLZ7(Problem):
+    """Disconnected Pareto front benchmark.
+
+    The standard DTLZ7 formulation has ``k = 20`` distance variables by
+    default.  The Pareto-optimal set is obtained at ``x_M, ..., x_D = 0`` and
+    produces a disconnected objective-space front.
+    """
+
+    def __init__(self, n_var: int | None = None, n_obj: int = 3) -> None:
+        if n_var is None:
+            n_var = n_obj + 19  # standard k=20
+        super().__init__(n_var=n_var, n_obj=n_obj)
+        self._k = n_var - n_obj + 1
+
+    def _evaluate(self, X: np.ndarray) -> tuple[np.ndarray, None]:
+        N = X.shape[0]
+        M = self.n_obj
+        xm = X[:, M - 1:]
+
+        g = 1.0 + 9.0 * np.sum(xm, axis=1) / self._k
+        F = np.zeros((N, M))
+        F[:, : M - 1] = X[:, : M - 1]
+
+        h_terms = (
+            (F[:, : M - 1] / (1.0 + g[:, None]))
+            * (1.0 + np.sin(3.0 * np.pi * F[:, : M - 1]))
+        )
+        h = M - np.sum(h_terms, axis=1)
+        F[:, M - 1] = (1.0 + g) * h
+        return F, None
+
+    def pareto_front(self, n_points: int = 500) -> np.ndarray | None:
+        """Return a deterministic approximation of the disconnected PF.
+
+        For the default three-objective case a dense grid is filtered by
+        non-domination.  For higher objective counts, deterministic uniform
+        samples are used to avoid an exponential grid.
+        """
+        from mosade.algorithm.selection import nondominated_mask
+
+        M = self.n_obj
+        if M < 2:
+            return None
+
+        intervals = ((0.0, 0.251412), (0.631627, 0.859401))
+        n_regions = 2 ** (M - 1)
+
+        if M <= 4:
+            import itertools
+
+            side = max(8, int(np.ceil((max(n_points, 1) / n_regions) ** (1.0 / (M - 1)))))
+            blocks = []
+            for region in itertools.product(intervals, repeat=M - 1):
+                axes = [np.linspace(lo, hi, side) for lo, hi in region]
+                mesh = np.meshgrid(*axes, indexing="ij")
+                blocks.append(np.column_stack([item.ravel() for item in mesh]))
+            prefix = np.vstack(blocks)
+        else:
+            rng = np.random.default_rng(707)
+            n_candidates = max(50_000, n_points * 200)
+            choices = rng.integers(0, 2, size=(n_candidates, M - 1))
+            lows = np.take([intervals[0][0], intervals[1][0]], choices)
+            highs = np.take([intervals[0][1], intervals[1][1]], choices)
+            prefix = rng.uniform(lows, highs)
+
+        g = 1.0
+        h_terms = (prefix / (1.0 + g)) * (1.0 + np.sin(3.0 * np.pi * prefix))
+        f_last = (1.0 + g) * (M - np.sum(h_terms, axis=1))
+        F = np.column_stack([prefix, f_last])
+        F = F[np.isfinite(F).all(axis=1) & (F[:, -1] >= 0.0)]
+        if F.size == 0:
+            return None
+
+        F = F[nondominated_mask(F)]
+        if F.shape[0] <= n_points:
+            return F
+
+        order = np.lexsort(tuple(F[:, idx] for idx in range(M - 1, -1, -1)))
+        idx = np.linspace(0, len(order) - 1, n_points, dtype=int)
+        return F[order[idx]]

@@ -30,6 +30,8 @@ import numpy as np
 
 from mosade.algorithm.mosade import MOSADEResult
 from mosade.algorithm.strategies import polynomial_mutation
+from mosade.metrics.hypervolume import hypervolume
+from mosade.metrics.igd import igd as compute_igd
 from mosade.problems.base import Problem
 from mosade.utils.seeding import get_rng
 
@@ -60,6 +62,8 @@ class NSGA2:
         SBX distribution index eta_c (higher → offspring closer to parents).
     mutation_eta : float
         Polynomial mutation distribution index eta_m.
+    track_interval : int
+        Evaluation interval for optional HV/IGD convergence snapshots.
     """
 
     def __init__(
@@ -70,6 +74,7 @@ class NSGA2:
         crossover_prob: float = 0.9,
         crossover_eta: float = 20.0,
         mutation_eta: float = 20.0,
+        track_interval: int = 0,
         **_extra: Any,  # absorb unknown keys from YAML configs gracefully
     ) -> None:
         # pop_size must be even so that paired crossover produces exactly N offspring.
@@ -79,6 +84,7 @@ class NSGA2:
         self.crossover_prob = crossover_prob
         self.crossover_eta = crossover_eta
         self.mutation_eta = mutation_eta
+        self.track_interval = track_interval
 
     # ------------------------------------------------------------------
     # Main entry point
@@ -120,6 +126,9 @@ class NSGA2:
         F, CV = problem.evaluate(X)
 
         history: dict[str, list] = {"gen": [], "n_evals": []}
+        if self.track_interval > 0:
+            history["convergence"] = []
+        _last_track_evals = 0
         gen = 0
 
         while problem.n_evals < self.max_evals:
@@ -164,6 +173,13 @@ class NSGA2:
 
             history["gen"].append(gen)
             history["n_evals"].append(problem.n_evals)
+            if self.track_interval > 0 and (
+                problem.n_evals - _last_track_evals >= self.track_interval
+            ):
+                history["convergence"].append(
+                    _convergence_snapshot(F, CV, problem.n_evals, pf, ref_point)
+                )
+                _last_track_evals = problem.n_evals
 
         # --- Return the final nondominated feasible front ---
         # Prefer strictly feasible solutions; fall back to all if none are feasible.
@@ -406,6 +422,32 @@ def _environmental_selection(
             break
 
     return X_all[keep], F_all[keep], CV_all[keep]
+
+
+def _convergence_snapshot(
+    F: np.ndarray,
+    CV: np.ndarray,
+    n_evals: int,
+    pf: np.ndarray | None,
+    ref_point: np.ndarray | None,
+) -> dict[str, object]:
+    """Compute HV/IGD convergence metrics from the live NSGA-II population."""
+    feasible = F[CV <= 0.0]
+    if feasible.size == 0:
+        F_nd = np.empty((0, F.shape[1]), dtype=float)
+    else:
+        ranks = _fast_nondominated_sort(feasible, np.zeros(feasible.shape[0]))
+        F_nd = feasible[ranks == 0]
+
+    hv_val: float | None = 0.0
+    if ref_point is not None and F_nd.shape[0] > 0:
+        hv_val = float(hypervolume(F_nd, np.asarray(ref_point, dtype=float)))
+
+    igd_val: float | None = None
+    if pf is not None and F_nd.shape[0] > 0:
+        igd_val = float(compute_igd(F_nd, pf))
+
+    return {"n_evals": int(n_evals), "hv": hv_val, "igd": igd_val}
 
 
 # ---------------------------------------------------------------------------

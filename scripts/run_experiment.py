@@ -23,8 +23,13 @@ def main() -> None:
         default="configs/smoke_test.yaml",
         help="Path to YAML config file (default: configs/smoke_test.yaml)",
     )
+    parser.add_argument(
+        "--run-dir",
+        default=None,
+        help="Explicit output directory. If omitted, the runner creates a timestamped run.",
+    )
     args = parser.parse_args()
-    run_dir = run_experiment(args.config)
+    run_dir = run_experiment(args.config, run_dir=args.run_dir)
     print(f"\nDone. Results saved to: {run_dir}")
 
 

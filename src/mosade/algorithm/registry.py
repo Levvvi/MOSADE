@@ -67,6 +67,28 @@ ALGORITHM_REGISTRY: dict[str, Any] = {
     "MOSADE_shared_memory": _mosade_preset(memory_scope="shared"),
     "MOSADE_no_restart": _mosade_preset(restart_enabled=False),
     "MOSADE_domselect": _mosade_preset(selection_mode="dominance"),
+    "MOSADE_fixed_FCR": _mosade_preset(
+        adapt_fcr=False,
+        fixed_F=0.5,
+        fixed_CR=0.5,
+    ),
+    "MOSADE_no_SR_adaptation": _mosade_preset(
+        adapt_fcr=False,
+        adapt_by_success_rate=False,
+        disable_credit=True,
+        fixed_F=0.5,
+        fixed_CR=0.5,
+    ),
+    # Diagnostic-only success-signal variants for KOF-1554 adaptation diagnosis.
+    # These do not change the default MOSADE entry and are not production
+    # algorithm replacements.
+    "MOSADE_success_dominance": _mosade_preset(success_criterion="dominance"),
+    "MOSADE_success_rank_crowding": _mosade_preset(success_criterion="rank_crowding"),
+    "MOSADE_success_decomposition": _mosade_preset(success_criterion="decomposition"),
+    "MOSADE_success_feasibility_first": _mosade_preset(
+        success_criterion="feasibility_first"
+    ),
+    "MOSADE_success_hvproxy": _mosade_preset(success_criterion="hvproxy"),
     # Deprecated compatibility alias.  It is retained so historical configs
     # remain runnable, but table-generation code refuses to export this label.
     "MOSADE_fixed_eps": _mosade_preset(
