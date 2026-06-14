@@ -991,7 +991,7 @@ def plot_metric_boxplots(
 
     bp = ax.boxplot(
         values,
-        labels=[_wrap_label(algorithm_display_name(label), width=10) for label in labels],
+        tick_labels=[_wrap_label(algorithm_display_name(label), width=10) for label in labels],
         patch_artist=True,
         widths=0.5,
     )
@@ -1489,8 +1489,7 @@ def plot_rank_heatmap(
     fig_h = max(4.5, 0.62 * n_rows + 0.12 * max_y_chars + 0.45)
     fig, ax = plt.subplots(figsize=(fig_w, fig_h))
 
-    cmap = plt.get_cmap("RdYlGn_r").copy()
-    cmap.set_bad(color="#d9d9d9")
+    cmap = plt.get_cmap("RdYlGn_r").with_extremes(bad="#d9d9d9")
     vmax = float(np.nanmax(display_mat)) if not np.isnan(display_mat).all() else float(n_algo)
     im = ax.imshow(display_mat, cmap=cmap, aspect="auto", vmin=1, vmax=max(vmax, 1.0))
 
