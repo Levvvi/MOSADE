@@ -49,6 +49,10 @@ dev = [
     "pytest-cov>=4.0",
     "ruff>=0.6.0",
 ]
+docs = [
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.25",
+]
 analysis = [
     "matplotlib>=3.9",  # Axes.boxplot(tick_labels=) and Colormap.with_extremes()
     "scipy>=1.10",
