@@ -34,7 +34,6 @@ external/
 archive/
 
 # Local generated or private working materials
-docs/
 plot/
 summaries/
 *_assets/
@@ -63,3 +62,9 @@ docs/MOSADE_Final_Integrated_Edit_Package/*.pdf
 
 # Local reference documents not part of the source/data package
 Real word problems.pdf
+
+# mkdocs build output
+site/
+
+# safety net: never track thesis document artifacts
+*.docx

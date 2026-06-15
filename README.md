@@ -34,10 +34,23 @@ Python 3.10 or newer is required. The optional dependency groups are
 full development install:
 
 ```bash
-pip install -e ".[dev,analysis,baselines]"
+pip install mosade
 ```
 
-## Quick start
+For the comparison baselines (pymoo) and the analysis/plotting tooling:
+
+```bash
+pip install "mosade[baselines,analysis]"
+```
+
+Python 3.10 or newer is required. To work on MOSADE itself, install from source
+with the development tools:
+
+```bash
+git clone https://github.com/Levvvi/MOSADE.git
+cd MOSADE
+pip install -e ".[dev,analysis,baselines]"
+```
 
 ```python
 import numpy as np
