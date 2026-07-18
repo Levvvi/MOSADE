@@ -106,8 +106,8 @@ pytest                                               # full suite
 pytest --cov=src/mosade --cov-report=term-missing    # with coverage
 ```
 
-On the 0.1.1 release commit, a clean test run reports 281 passed and 6 skipped.
-Line coverage for the shipped library (`src/mosade`) is 87%, with CI enforcing
+On the 0.1.1 release commit, a clean test run reports 287 passed and 5 skipped.
+Line coverage for the shipped library (`src/mosade`) is 89%, with CI enforcing
 at least 85% on Python 3.10, 3.11, 3.12, and 3.13.
 
 The suite emphasises what matters for a stochastic optimiser: seed-determinism,
