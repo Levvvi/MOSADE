@@ -1,8 +1,8 @@
-\# API reference
+# API reference
 
 
 
-\## Algorithm
+## Algorithm
 
 
 
@@ -14,7 +14,7 @@
 
 
 
-\## Problems
+## Problems
 
 
 
@@ -22,7 +22,7 @@
 
 
 
-\## Metrics
+## Metrics
 
 
 
